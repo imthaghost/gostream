@@ -7,5 +7,3 @@ install:
     - go get github.com/labstack/gommon
     - go get github.com/valyala/fasttemplate 
 
-script:
-    - go test tests/* -v 

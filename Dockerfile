@@ -2,7 +2,7 @@
 FROM golang:alpine3.12
 
 # Enviornment variables
-ENV APP_NAME gostream
+ENV APP_NAME goStream
 ENV PORT 8000
 
 # Open system port

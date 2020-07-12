@@ -1,6 +1,7 @@
 language: go
 
 install:
+    
     - github.com/fatih/color 
     - github.com/labstack/echo 
     - github.com/labstack/gommon

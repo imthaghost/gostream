@@ -1,0 +1,10 @@
+language: go
+
+install:
+    - github.com/dgrijalva/jwt-go 
+    - github.com/fatih/color 
+    - github.com/labstack/echo 
+    - github.com/labstack/gommon
+    - github.com/valyala/fasttemplate 
+script:
+    - go test tests/* -v 

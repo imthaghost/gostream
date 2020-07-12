@@ -1,11 +1,11 @@
 language: go
 
 install:
-    
-    - github.com/fatih/color 
-    - github.com/labstack/echo 
-    - github.com/labstack/gommon
-    - github.com/valyala/fasttemplate 
+    - go get github.com/dgrijalva/jwt-go
+    - go get github.com/fatih/color 
+    - go get github.com/labstack/echo 
+    - go get github.com/labstack/gommon
+    - go get github.com/valyala/fasttemplate 
 
 script:
     - go test tests/* -v 

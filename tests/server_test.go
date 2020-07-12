@@ -17,7 +17,7 @@ func TestServer(t *testing.T) {
 	// start a server
 	go s.Start(":8000")
 	// GET request to server root route
-	resp, err := http.Get("http://127.0.0.1:8000")
+	resp, err := http.Get("http://0.0.0.0:8000")
 	if err != nil {
 		log.Fatalln(err)
 	}

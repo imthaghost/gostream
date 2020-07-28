@@ -38,7 +38,6 @@ func TestConnReadNormal(t *testing.T) {
 	at.Equal(int(c.TypeID), 9)
 }
 
-//交叉读音视频数据
 func TestConnCrossReading(t *testing.T) {
 	at := assert.New(t)
 	data1 := make([]byte, 128)

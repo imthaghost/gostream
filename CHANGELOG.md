@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - JSON Web Token support.
 ``` json 
-    // livego.json
+    // gostream.json
     {
         "jwt": {
             "secret": "testing",
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ```
 - Use redis for store room keys
 ``` json 
-    // livego.json
+    // gostream.json
     {
         "redis_addr": "localhost:6379", 
         "server": [

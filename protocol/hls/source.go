@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/imthaghost/gostream/configure"
-
 	"github.com/imthaghost/gostream/av"
 	"github.com/imthaghost/gostream/container/flv"
 	"github.com/imthaghost/gostream/container/ts"
@@ -267,7 +266,7 @@ func (source *Source) muxAudio(limit byte) error {
 	_, pts, buf := source.cache.GetFrame()
 	p.Data = buf
 	p.TimeStamp = uint32(pts / h264_default_hz)
-	return source.muxer.Mux(&p, source.btswriter)
+	return source.muxer.Mux(&p source.btswriter)
 }
 
 func (source *Source) tsMux(p *av.Packet) error {

@@ -6,7 +6,7 @@ GOGET = $(GOCMD) get
 BINARY_NAME = gostream
 BINARY_UNIX = $(BINARY_NAME)_unix
 
-DOCKER_ACC ?= gwuhaolin
+DOCKER_ACC ?= imthaghost
 DOCKER_REPO ?= gostream
 
 TAG ?= $(shell git describe --tags --abbrev=0 2>/dev/null)

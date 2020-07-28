@@ -1,25 +1,21 @@
-# Golang version
-FROM golang:alpine3.12
-
-# Enviornment variables
-ENV APP_NAME goStream
-ENV PORT 8000
-
-# Open system port
-EXPOSE ${PORT}
-
-# Working directory
-WORKDIR /go/src/${APP_NAME}
-
-COPY . /go/src/${APP_NAME}
-
-# Install dependecies from mod file
+FROM golang:latest as builder
+WORKDIR /app
+ENV GOPROXY https://goproxy.io
+COPY go.mod go.sum ./
 RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o livego .
 
-# Build application
-RUN go build -o ${APP_NAME}
-
-# Run application
-CMD ./${APP_NAME}
-
-
+FROM alpine:latest
+RUN mkdir -p /app/config
+WORKDIR /app
+ENV RTMP_PORT 1935
+ENV HTTP_FLV_PORT 7001
+ENV HLS_PORT 7002
+ENV HTTP_OPERATION_PORT 8090
+COPY --from=builder /app/livego .
+EXPOSE ${RTMP_PORT}
+EXPOSE ${HTTP_FLV_PORT}
+EXPOSE ${HLS_PORT}
+EXPOSE ${HTTP_OPERATION_PORT}
+ENTRYPOINT ["./livego"]

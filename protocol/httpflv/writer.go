@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/protocol/amf"
 	"github.com/imthaghost/gostream/utils/pio"
 	"github.com/imthaghost/gostream/utils/uid"
@@ -20,13 +20,13 @@ const (
 
 type FLVWriter struct {
 	Uid string
-	av.RWBaser
+	avv.RWBaser
 	app, title, url string
 	buf             []byte
 	closed          bool
 	closedChan      chan struct{}
 	ctx             http.ResponseWriter
-	packetQueue     chan *av.Packet
+	packetQueue     chan *avv.Packet
 }
 
 func NewFLVWriter(app, title, url string, ctx http.ResponseWriter) *FLVWriter {
@@ -36,10 +36,10 @@ func NewFLVWriter(app, title, url string, ctx http.ResponseWriter) *FLVWriter {
 		title:       title,
 		url:         url,
 		ctx:         ctx,
-		RWBaser:     av.NewRWBaser(time.Second * 10),
+		RWBaser:     avv.NewRWBaser(time.Second * 10),
 		closedChan:  make(chan struct{}),
 		buf:         make([]byte, headerLen),
-		packetQueue: make(chan *av.Packet, maxQueueNum),
+		packetQueue: make(chan *avv.Packet, maxQueueNum),
 	}
 
 	ret.ctx.Write([]byte{0x46, 0x4c, 0x56, 0x01, 0x05, 0x00, 0x00, 0x00, 0x09})
@@ -55,12 +55,12 @@ func NewFLVWriter(app, title, url string, ctx http.ResponseWriter) *FLVWriter {
 	return ret
 }
 
-func (flvWriter *FLVWriter) DropPacket(pktQue chan *av.Packet, info av.Info) {
+func (flvWriter *FLVWriter) DropPacket(pktQue chan *avv.Packet, info avv.Info) {
 	log.Warningf("[%v] packet queue max!!!", info)
 	for i := 0; i < maxQueueNum-84; i++ {
 		tmpPkt, ok := <-pktQue
 		if ok && tmpPkt.IsVideo {
-			videoPkt, ok := tmpPkt.Header.(av.VideoPacketHeader)
+			videoPkt, ok := tmpPkt.Header.(avv.VideoPacketHeader)
 			// dont't drop sps config and dont't drop key frame
 			if ok && (videoPkt.IsSeq() || videoPkt.IsKeyFrame()) {
 				log.Debug("insert keyframe to queue")
@@ -82,7 +82,7 @@ func (flvWriter *FLVWriter) DropPacket(pktQue chan *av.Packet, info av.Info) {
 	log.Debug("packet queue len: ", len(pktQue))
 }
 
-func (flvWriter *FLVWriter) Write(p *av.Packet) (err error) {
+func (flvWriter *FLVWriter) Write(p *avv.Packet) (err error) {
 	err = nil
 	if flvWriter.closed {
 		err = fmt.Errorf("flvwrite source closed")
@@ -110,17 +110,17 @@ func (flvWriter *FLVWriter) SendPacket() error {
 		if ok {
 			flvWriter.RWBaser.SetPreTime()
 			h := flvWriter.buf[:headerLen]
-			typeID := av.TAG_VIDEO
+			typeID := avv.TAG_VIDEO
 			if !p.IsVideo {
 				if p.IsMetadata {
 					var err error
-					typeID = av.TAG_SCRIPTDATAAMF0
+					typeID = avv.TAG_SCRIPTDATAAMF0
 					p.Data, err = amf.MetaDataReform(p.Data, amf.DEL)
 					if err != nil {
 						return err
 					}
 				} else {
-					typeID = av.TAG_AUDIO
+					typeID = avv.TAG_AUDIO
 				}
 			}
 			dataLen := len(p.Data)
@@ -174,7 +174,7 @@ func (flvWriter *FLVWriter) Close(error) {
 	flvWriter.closed = true
 }
 
-func (flvWriter *FLVWriter) Info() (ret av.Info) {
+func (flvWriter *FLVWriter) Info() (ret avv.Info) {
 	ret.UID = flvWriter.Uid
 	ret.URL = flvWriter.url
 	ret.Key = flvWriter.app + "/" + flvWriter.title

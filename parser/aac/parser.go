@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 )
 
 type mpegExtension struct {
@@ -105,9 +105,9 @@ func (parser *Parser) SampleRate() int {
 
 func (parser *Parser) Parse(b []byte, packetType uint8, w io.Writer) (err error) {
 	switch packetType {
-	case av.AAC_SEQHDR:
+	case avv.AAC_SEQHDR:
 		err = parser.specificInfo(b)
-	case av.AAC_RAW:
+	case avv.AAC_RAW:
 		err = parser.adts(b, w)
 	}
 	return

@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/protocol/rtmp"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type Server struct {
-	handler av.Handler
+	handler avv.Handler
 }
 
 type stream struct {
@@ -26,7 +26,7 @@ type streams struct {
 	Players    []stream `json:"players"`
 }
 
-func NewServer(h av.Handler) *Server {
+func NewServer(h avv.Handler) *Server {
 	return &Server{
 		handler: h,
 	}
@@ -44,7 +44,7 @@ func (server *Server) Serve(l net.Listener) error {
 	return nil
 }
 
-// 获取发布和播放器的信息
+// 
 func (server *Server) getStreams(w http.ResponseWriter, r *http.Request) *streams {
 	rtmpStream := server.handler.(*rtmp.RtmpStream)
 	if rtmpStream == nil {
@@ -107,7 +107,6 @@ func (server *Server) handleConn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 判断视屏流是否发布,如果没有发布,直接返回404
 	msgs := server.getStreams(w, r)
 	if msgs == nil || len(msgs.Publishers) == 0 {
 		http.Error(w, "invalid path", http.StatusNotFound)

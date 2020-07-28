@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/imthaghost/gostream/configure"
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/container/flv"
 	"github.com/imthaghost/gostream/container/ts"
 	"github.com/imthaghost/gostream/parser"
@@ -23,9 +23,9 @@ const (
 )
 
 type Source struct {
-	av.RWBaser
+	avv.RWBaser
 	seq         int
-	info        av.Info
+	info        avv.Info
 	bwriter     *bytes.Buffer
 	btswriter   *bytes.Buffer
 	demuxer     *flv.Demuxer
@@ -37,23 +37,23 @@ type Source struct {
 	tsCache     *TSCacheItem
 	tsparser    *parser.CodecParser
 	closed      bool
-	packetQueue chan *av.Packet
+	packetQueue chan *avv.Packet
 }
 
-func NewSource(info av.Info) *Source {
+func NewSource(info avv.Info) *Source {
 	info.Inter = true
 	s := &Source{
 		info:        info,
 		align:       &align{},
 		stat:        newStatus(),
-		RWBaser:     av.NewRWBaser(time.Second * 10),
+		RWBaser:     avv.NewRWBaser(time.Second * 10),
 		cache:       newAudioCache(),
 		demuxer:     flv.NewDemuxer(),
 		muxer:       ts.NewMuxer(),
 		tsCache:     NewTSCacheItem(info.Key),
 		tsparser:    parser.NewCodecParser(),
 		bwriter:     bytes.NewBuffer(make([]byte, 100*1024)),
-		packetQueue: make(chan *av.Packet, maxQueueNum),
+		packetQueue: make(chan *avv.Packet, maxQueueNum),
 	}
 	go func() {
 		err := s.SendPacket()
@@ -69,7 +69,7 @@ func (source *Source) GetCacheInc() *TSCacheItem {
 	return source.tsCache
 }
 
-func (source *Source) DropPacket(pktQue chan *av.Packet, info av.Info) {
+func (source *Source) DropPacket(pktQue chan *avv.Packet, info avv.Info) {
 	log.Warningf("[%v] packet queue max!!!", info)
 	for i := 0; i < maxQueueNum-84; i++ {
 		tmpPkt, ok := <-pktQue
@@ -83,7 +83,7 @@ func (source *Source) DropPacket(pktQue chan *av.Packet, info av.Info) {
 		}
 
 		if ok && tmpPkt.IsVideo {
-			videoPkt, ok := tmpPkt.Header.(av.VideoPacketHeader)
+			videoPkt, ok := tmpPkt.Header.(avv.VideoPacketHeader)
 			// dont't drop sps config and dont't drop key frame
 			if ok && (videoPkt.IsSeq() || videoPkt.IsKeyFrame()) {
 				pktQue <- tmpPkt
@@ -97,7 +97,7 @@ func (source *Source) DropPacket(pktQue chan *av.Packet, info av.Info) {
 	log.Debug("packet queue len: ", len(pktQue))
 }
 
-func (source *Source) Write(p *av.Packet) (err error) {
+func (source *Source) Write(p *avv.Packet) (err error) {
 	err = nil
 	if source.closed {
 		err = fmt.Errorf("hls source closed")
@@ -167,7 +167,7 @@ func (source *Source) SendPacket() error {
 	}
 }
 
-func (source *Source) Info() (ret av.Info) {
+func (source *Source) Info() (ret avv.Info) {
 	return source.info
 }
 
@@ -206,17 +206,17 @@ func (source *Source) cut() {
 	}
 	if newf {
 		source.btswriter.Write(source.muxer.PAT())
-		source.btswriter.Write(source.muxer.PMT(av.SOUND_AAC, true))
+		source.btswriter.Write(source.muxer.PMT(avv.SOUND_AAC, true))
 	}
 }
 
-func (source *Source) parse(p *av.Packet) (int32, bool, error) {
+func (source *Source) parse(p *avv.Packet) (int32, bool, error) {
 	var compositionTime int32
-	var ah av.AudioPacketHeader
-	var vh av.VideoPacketHeader
+	var ah avv.AudioPacketHeader
+	var vh avv.VideoPacketHeader
 	if p.IsVideo {
-		vh = p.Header.(av.VideoPacketHeader)
-		if vh.CodecID() != av.VIDEO_H264 {
+		vh = p.Header.(avv.VideoPacketHeader)
+		if vh.CodecID() != avv.VIDEO_H264 {
 			return compositionTime, false, ErrNoSupportVideoCodec
 		}
 		compositionTime = vh.CompositionTime()
@@ -224,11 +224,11 @@ func (source *Source) parse(p *av.Packet) (int32, bool, error) {
 			return compositionTime, true, source.tsparser.Parse(p, source.bwriter)
 		}
 	} else {
-		ah = p.Header.(av.AudioPacketHeader)
-		if ah.SoundFormat() != av.SOUND_AAC {
+		ah = p.Header.(avv.AudioPacketHeader)
+		if ah.SoundFormat() != avv.SOUND_AAC {
 			return compositionTime, false, ErrNoSupportAudioCodec
 		}
-		if ah.AACPacketType() == av.AAC_SEQHDR {
+		if ah.AACPacketType() == avv.AAC_SEQHDR {
 			return compositionTime, true, source.tsparser.Parse(p, source.bwriter)
 		}
 	}
@@ -262,14 +262,14 @@ func (source *Source) muxAudio(limit byte) error {
 	if source.cache.CacheNum() < limit {
 		return nil
 	}
-	var p av.Packet
+	var p avv.Packet
 	_, pts, buf := source.cache.GetFrame()
 	p.Data = buf
 	p.TimeStamp = uint32(pts / h264_default_hz)
-	return source.muxer.Mux(&p source.btswriter)
+	return source.muxer.Mux(&p, source.btswriter)
 }
 
-func (source *Source) tsMux(p *av.Packet) error {
+func (source *Source) tsMux(p *avv.Packet) error {
 	if p.IsVideo {
 		return source.muxer.Mux(p, source.btswriter)
 	} else {

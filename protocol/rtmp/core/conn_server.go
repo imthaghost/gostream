@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/protocol/amf"
 
 	log "github.com/sirupsen/logrus"
@@ -327,8 +327,8 @@ func (connServer *ConnServer) IsPublisher() bool {
 }
 
 func (connServer *ConnServer) Write(c ChunkStream) error {
-	if c.TypeID == av.TAG_SCRIPTDATAAMF0 ||
-		c.TypeID == av.TAG_SCRIPTDATAAMF3 {
+	if c.TypeID == avv.TAG_SCRIPTDATAAMF0 ||
+		c.TypeID == avv.TAG_SCRIPTDATAAMF3 {
 		var err error
 		if c.Data, err = amf.MetaDataReform(c.Data, amf.DEL); err != nil {
 			return err

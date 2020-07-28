@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/configure"
 	"github.com/imthaghost/gostream/protocol/rtmp"
 	"github.com/imthaghost/gostream/protocol/rtmp/rtmprelay"
@@ -49,12 +49,12 @@ type ClientInfo struct {
 }
 
 type Server struct {
-	handler  av.Handler
+	handler  avv.Handler
 	session  map[string]*rtmprelay.RtmpRelay
 	rtmpAddr string
 }
 
-func NewServer(h av.Handler, rtmpAddr string) *Server {
+func NewServer(h avv.Handler, rtmpAddr string) *Server {
 	return &Server{
 		handler:  h,
 		session:  make(map[string]*rtmprelay.RtmpRelay),

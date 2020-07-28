@@ -3,7 +3,7 @@ package ts
 import (
 	"io"
 
-	"github.com/gwuhaolin/livego/av"
+	"github.com/imthaghost/gostream/avv"
 )
 
 const (
@@ -31,7 +31,7 @@ func NewMuxer() *Muxer {
 	return &Muxer{}
 }
 
-func (muxer *Muxer) Mux(p *av.Packet, w io.Writer) error {
+func (muxer *Muxer) Mux(p *avv.Packet, w io.Writer) error {
 	first := true
 	wBytes := 0
 	pesIndex := 0
@@ -42,10 +42,10 @@ func (muxer *Muxer) Mux(p *av.Packet, w io.Writer) error {
 	dts := int64(p.TimeStamp) * int64(h264DefaultHZ)
 	pts := dts
 	pid := audioPID
-	var videoH av.VideoPacketHeader
+	var videoH avv.VideoPacketHeader
 	if p.IsVideo {
 		pid = videoPID
-		videoH, _ = p.Header.(av.VideoPacketHeader)
+		videoH, _ = p.Header.(avv.VideoPacketHeader)
 		pts = dts + int64(videoH.CompositionTime())*int64(h264DefaultHZ)
 	}
 	err := pes.packet(p, pts, dts)
@@ -289,7 +289,7 @@ type pesHeader struct {
 }
 
 //pesPacket return pes packet
-func (header *pesHeader) packet(p *av.Packet, pts, dts int64) error {
+func (header *pesHeader) packet(p *avv.Packet, pts, dts int64) error {
 	//PES header
 	i := 0
 	header.data[i] = 0x00

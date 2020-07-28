@@ -3,7 +3,7 @@ package cache
 import (
 	"bytes"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/protocol/amf"
 
 	log "github.com/sirupsen/logrus"
@@ -27,19 +27,19 @@ func init() {
 
 type SpecialCache struct {
 	full bool
-	p    *av.Packet
+	p    *avv.Packet
 }
 
 func NewSpecialCache() *SpecialCache {
 	return &SpecialCache{}
 }
 
-func (specialCache *SpecialCache) Write(p *av.Packet) {
+func (specialCache *SpecialCache) Write(p *avv.Packet) {
 	specialCache.p = p
 	specialCache.full = true
 }
 
-func (specialCache *SpecialCache) Send(w av.WriteCloser) error {
+func (specialCache *SpecialCache) Send(w avv.WriteCloser) error {
 	if !specialCache.full {
 		return nil
 	}

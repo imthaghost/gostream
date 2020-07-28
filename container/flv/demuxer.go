@@ -3,7 +3,7 @@ package flv
 import (
 	"fmt"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 )
 
 var (
@@ -17,7 +17,7 @@ func NewDemuxer() *Demuxer {
 	return &Demuxer{}
 }
 
-func (d *Demuxer) DemuxH(p *av.Packet) error {
+func (d *Demuxer) DemuxH(p *avv.Packet) error {
 	var tag Tag
 	_, err := tag.ParseMediaTagHeader(p.Data, p.IsVideo)
 	if err != nil {
@@ -28,13 +28,13 @@ func (d *Demuxer) DemuxH(p *av.Packet) error {
 	return nil
 }
 
-func (d *Demuxer) Demux(p *av.Packet) error {
+func (d *Demuxer) Demux(p *avv.Packet) error {
 	var tag Tag
 	n, err := tag.ParseMediaTagHeader(p.Data, p.IsVideo)
 	if err != nil {
 		return err
 	}
-	if tag.CodecID() == av.VIDEO_H264 &&
+	if tag.CodecID() == avv.VIDEO_H264 &&
 		p.Data[0] == 0x17 && p.Data[1] == 0x02 {
 		return ErrAvcEndSEQ
 	}

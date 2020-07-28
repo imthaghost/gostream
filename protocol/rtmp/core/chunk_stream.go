@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/utils/pool"
 )
 
@@ -81,11 +81,11 @@ END:
 }
 
 func (chunkStream *ChunkStream) writeChunk(w *ReadWriter, chunkSize int) error {
-	if chunkStream.TypeID == av.TAG_AUDIO {
+	if chunkStream.TypeID == avv.TAG_AUDIO {
 		chunkStream.CSID = 4
-	} else if chunkStream.TypeID == av.TAG_VIDEO ||
-		chunkStream.TypeID == av.TAG_SCRIPTDATAAMF0 ||
-		chunkStream.TypeID == av.TAG_SCRIPTDATAAMF3 {
+	} else if chunkStream.TypeID == avv.TAG_VIDEO ||
+		chunkStream.TypeID == avv.TAG_SCRIPTDATAAMF0 ||
+		chunkStream.TypeID == avv.TAG_SCRIPTDATAAMF3 {
 		chunkStream.CSID = 6
 	}
 

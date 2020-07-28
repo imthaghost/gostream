@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/configure"
 	"github.com/imthaghost/gostream/protocol/rtmp/core"
 
@@ -13,7 +13,7 @@ import (
 
 type StaticPush struct {
 	RtmpUrl       string
-	packet_chan   chan *av.Packet
+	packet_chan   chan *avv.Packet
 	sndctrl_chan  chan string
 	connectClient *core.ConnClient
 	startflag     bool
@@ -84,7 +84,7 @@ func ReleaseStaticPushObject(rtmpurl string) {
 func NewStaticPush(rtmpurl string) *StaticPush {
 	return &StaticPush{
 		RtmpUrl:       rtmpurl,
-		packet_chan:   make(chan *av.Packet, 500),
+		packet_chan:   make(chan *avv.Packet, 500),
 		sndctrl_chan:  make(chan string),
 		connectClient: nil,
 		startflag:     false,
@@ -121,7 +121,7 @@ func (self *StaticPush) Stop() {
 	self.startflag = false
 }
 
-func (self *StaticPush) WriteAvPacket(packet *av.Packet) {
+func (self *StaticPush) WriteAvPacket(packet *avv.Packet) {
 	if !self.startflag {
 		return
 	}
@@ -129,7 +129,7 @@ func (self *StaticPush) WriteAvPacket(packet *av.Packet) {
 	self.packet_chan <- packet
 }
 
-func (self *StaticPush) sendPacket(p *av.Packet) {
+func (self *StaticPush) sendPacket(p *avv.Packet) {
 	if !self.startflag {
 		return
 	}
@@ -144,12 +144,12 @@ func (self *StaticPush) sendPacket(p *av.Packet) {
 	//log.Printf("Static sendPacket: rtmpurl=%s, length=%d, streamid=%d",
 	//	self.RtmpUrl, len(p.Data), cs.StreamID)
 	if p.IsVideo {
-		cs.TypeID = av.TAG_VIDEO
+		cs.TypeID = avv.TAG_VIDEO
 	} else {
 		if p.IsMetadata {
-			cs.TypeID = av.TAG_SCRIPTDATAAMF0
+			cs.TypeID = avv.TAG_SCRIPTDATAAMF0
 		} else {
-			cs.TypeID = av.TAG_AUDIO
+			cs.TypeID = avv.TAG_AUDIO
 		}
 	}
 

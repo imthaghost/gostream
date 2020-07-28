@@ -3,7 +3,7 @@ package cache
 import (
 	"fmt"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 )
 
 var (
@@ -13,13 +13,13 @@ var (
 
 type array struct {
 	index   int
-	packets []*av.Packet
+	packets []*avv.Packet
 }
 
 func newArray() *array {
 	ret := &array{
 		index:   0,
-		packets: make([]*av.Packet, 0, maxGOPCap),
+		packets: make([]*avv.Packet, 0, maxGOPCap),
 	}
 	return ret
 }
@@ -29,7 +29,7 @@ func (array *array) reset() {
 	array.packets = array.packets[:0]
 }
 
-func (array *array) write(packet *av.Packet) error {
+func (array *array) write(packet *avv.Packet) error {
 	if array.index >= maxGOPCap {
 		return ErrGopTooBig
 	}
@@ -38,7 +38,7 @@ func (array *array) write(packet *av.Packet) error {
 	return nil
 }
 
-func (array *array) send(w av.WriteCloser) error {
+func (array *array) send(w avv.WriteCloser) error {
 	var err error
 	for i := 0; i < array.index; i++ {
 		packet := array.packets[i]
@@ -64,7 +64,7 @@ func NewGopCache(num int) *GopCache {
 	}
 }
 
-func (gopCache *GopCache) writeToArray(chunk *av.Packet, startNew bool) error {
+func (gopCache *GopCache) writeToArray(chunk *avv.Packet, startNew bool) error {
 	var ginc *array
 	if startNew {
 		ginc = gopCache.gops[gopCache.nextindex]
@@ -84,10 +84,10 @@ func (gopCache *GopCache) writeToArray(chunk *av.Packet, startNew bool) error {
 	return nil
 }
 
-func (gopCache *GopCache) Write(p *av.Packet) {
+func (gopCache *GopCache) Write(p *avv.Packet) {
 	var ok bool
 	if p.IsVideo {
-		vh := p.Header.(av.VideoPacketHeader)
+		vh := p.Header.(avv.VideoPacketHeader)
 		if vh.IsKeyFrame() && !vh.IsSeq() {
 			ok = true
 		}
@@ -98,7 +98,7 @@ func (gopCache *GopCache) Write(p *av.Packet) {
 	}
 }
 
-func (gopCache *GopCache) sendTo(w av.WriteCloser) error {
+func (gopCache *GopCache) sendTo(w avv.WriteCloser) error {
 	var err error
 	pos := (gopCache.nextindex + 1) % gopCache.count
 	for i := 0; i < gopCache.num; i++ {
@@ -115,6 +115,6 @@ func (gopCache *GopCache) sendTo(w av.WriteCloser) error {
 	return nil
 }
 
-func (gopCache *GopCache) Send(w av.WriteCloser) error {
+func (gopCache *GopCache) Send(w avv.WriteCloser) error {
 	return gopCache.sendTo(w)
 }

@@ -9,7 +9,7 @@ import (
 	neturl "net/url"
 	"strings"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/protocol/amf"
 
 	log "github.com/sirupsen/logrus"
@@ -281,12 +281,12 @@ func (connClient *ConnClient) Start(url string, method string) error {
 		return err
 	}
 
-	log.Debug("method control:", method, av.PUBLISH, av.PLAY)
-	if method == av.PUBLISH {
+	log.Debug("method control:", method, avv.PUBLISH, avv.PLAY)
+	if method == avv.PUBLISH {
 		if err := connClient.writePublishMsg(); err != nil {
 			return err
 		}
-	} else if method == av.PLAY {
+	} else if method == avv.PLAY {
 		if err := connClient.writePlayMsg(); err != nil {
 			return err
 		}
@@ -296,8 +296,8 @@ func (connClient *ConnClient) Start(url string, method string) error {
 }
 
 func (connClient *ConnClient) Write(c ChunkStream) error {
-	if c.TypeID == av.TAG_SCRIPTDATAAMF0 ||
-		c.TypeID == av.TAG_SCRIPTDATAAMF3 {
+	if c.TypeID == avv.TAG_SCRIPTDATAAMF0 ||
+		c.TypeID == avv.TAG_SCRIPTDATAAMF3 {
 		var err error
 		if c.Data, err = amf.MetaDataReform(c.Data, amf.ADD); err != nil {
 			return err

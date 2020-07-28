@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/protocol/rtmp/cache"
 	"github.com/imthaghost/gostream/protocol/rtmp/rtmprelay"
 
@@ -29,7 +29,7 @@ func NewRtmpStream() *RtmpStream {
 	return ret
 }
 
-func (rs *RtmpStream) HandleReader(r av.ReadCloser) {
+func (rs *RtmpStream) HandleReader(r avv.ReadCloser) {
 	info := r.Info()
 	log.Debugf("HandleReader: info[%v]", info)
 
@@ -53,7 +53,7 @@ func (rs *RtmpStream) HandleReader(r av.ReadCloser) {
 	stream.AddReader(r)
 }
 
-func (rs *RtmpStream) HandleWriter(w av.WriteCloser) {
+func (rs *RtmpStream) HandleWriter(w avv.WriteCloser) {
 	info := w.Info()
 	log.Debugf("HandleWriter: info[%v]", info)
 
@@ -91,17 +91,17 @@ func (rs *RtmpStream) CheckAlive() {
 type Stream struct {
 	isStart bool
 	cache   *cache.Cache
-	r       av.ReadCloser
+	r       avv.ReadCloser
 	ws      cmap.ConcurrentMap
-	info    av.Info
+	info    avv.Info
 }
 
 type PackWriterCloser struct {
 	init bool
-	w    av.WriteCloser
+	w    avv.WriteCloser
 }
 
-func (p *PackWriterCloser) GetWriter() av.WriteCloser {
+func (p *PackWriterCloser) GetWriter() avv.WriteCloser {
 	return p.w
 }
 
@@ -119,7 +119,7 @@ func (s *Stream) ID() string {
 	return EmptyID
 }
 
-func (s *Stream) GetReader() av.ReadCloser {
+func (s *Stream) GetReader() avv.ReadCloser {
 	return s.r
 }
 
@@ -136,19 +136,18 @@ func (s *Stream) Copy(dst *Stream) {
 	}
 }
 
-func (s *Stream) AddReader(r av.ReadCloser) {
+func (s *Stream) AddReader(r avv.ReadCloser) {
 	s.r = r
 	go s.TransStart()
 }
 
-func (s *Stream) AddWriter(w av.WriteCloser) {
+func (s *Stream) AddWriter(w avv.WriteCloser) {
 	info := w.Info()
 	pw := &PackWriterCloser{w: w}
 	s.ws.Set(info.UID, pw)
 }
 
-/*检测本application下是否配置static_push,
-如果配置, 启动push远端的连接*/
+
 func (s *Stream) StartStaticPush() {
 	key := s.info.Key
 
@@ -268,7 +267,7 @@ func (s *Stream) IsSendStaticPush() bool {
 	return false
 }
 
-func (s *Stream) SendStaticPush(packet av.Packet) {
+func (s *Stream) SendStaticPush(packet avv.Packet) {
 	key := s.info.Key
 
 	dscr := strings.Split(key, "/")
@@ -307,7 +306,7 @@ func (s *Stream) SendStaticPush(packet av.Packet) {
 
 func (s *Stream) TransStart() {
 	s.isStart = true
-	var p av.Packet
+	var p avv.Packet
 
 	log.Debugf("TransStart: %v", s.info)
 

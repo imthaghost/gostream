@@ -11,7 +11,7 @@ import (
 
 	"github.com/imthaghost/gostream/configure"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 
 	cmap "github.com/orcaman/concurrent-map"
 	log "github.com/sirupsen/logrus"
@@ -57,7 +57,7 @@ func (server *Server) Serve(listener net.Listener) error {
 	return nil
 }
 
-func (server *Server) GetWriter(info av.Info) av.WriteCloser {
+func (server *Server) GetWriter(info avv.Info) avv.WriteCloser {
 	var s *Source
 	ok := server.conns.Has(info.Key)
 	if !ok {

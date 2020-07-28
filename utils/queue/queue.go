@@ -3,14 +3,14 @@ package queue
 import (
 	"sync"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 )
 
 // Queue is a basic FIFO queue for Messages.
 type Queue struct {
 	maxSize int
 
-	list  []*av.Packet
+	list  []*avv.Packet
 	mutex sync.Mutex
 }
 
@@ -23,7 +23,7 @@ func NewQueue(maxSize int) *Queue {
 }
 
 // Push adds a message to the queue.
-func (q *Queue) Push(msg *av.Packet) {
+func (q *Queue) Push(msg *avv.Packet) {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
 
@@ -35,7 +35,7 @@ func (q *Queue) Push(msg *av.Packet) {
 }
 
 // Pop removes and returns a message from the queue in first to last order.
-func (q *Queue) Pop() *av.Packet {
+func (q *Queue) Pop() *avv.Packet {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
 
@@ -46,7 +46,7 @@ func (q *Queue) Pop() *av.Packet {
 	return q.pop()
 }
 
-func (q *Queue) pop() *av.Packet {
+func (q *Queue) pop() *avv.Packet {
 	x := len(q.list) - 1
 	msg := q.list[x]
 	q.list = q.list[:x]
@@ -62,7 +62,7 @@ func (q *Queue) Len() int {
 }
 
 // All returns and removes all messages from the queue.
-func (q *Queue) All() []*av.Packet {
+func (q *Queue) All() []*avv.Packet {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
 

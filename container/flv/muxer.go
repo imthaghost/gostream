@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/configure"
 	"github.com/imthaghost/gostream/protocol/amf"
 	"github.com/imthaghost/gostream/utils/pio"
@@ -20,30 +20,7 @@ var (
 	flvHeader = []byte{0x46, 0x4c, 0x56, 0x01, 0x05, 0x00, 0x00, 0x00, 0x09}
 )
 
-/*
-func NewFlv(handler av.Handler, info av.Info) {
-	patths := strings.SplitN(info.Key, "/", 2)
 
-	if len(patths) != 2 {
-		log.Warning("invalid info")
-		return
-	}
-
-	w, err := os.OpenFile(*flvFile, os.O_CREATE|os.O_RDWR, 0755)
-	if err != nil {
-		log.Error("open file error: ", err)
-	}
-
-	writer := NewFLVWriter(patths[0], patths[1], info.URL, w)
-
-	handler.HandleWriter(writer)
-
-	writer.Wait()
-	// close flv file
-	log.Debug("close flv file")
-	writer.ctx.Close()
-}
-*/
 
 const (
 	headerLen = 11
@@ -51,7 +28,7 @@ const (
 
 type FLVWriter struct {
 	Uid string
-	av.RWBaser
+	avv.RWBaser
 	app, title, url string
 	buf             []byte
 	closed          chan struct{}
@@ -65,7 +42,7 @@ func NewFLVWriter(app, title, url string, ctx *os.File) *FLVWriter {
 		title:   title,
 		url:     url,
 		ctx:     ctx,
-		RWBaser: av.NewRWBaser(time.Second * 10),
+		RWBaser: avv.NewRWBaser(time.Second * 10),
 		closed:  make(chan struct{}),
 		buf:     make([]byte, headerLen),
 	}
@@ -77,20 +54,20 @@ func NewFLVWriter(app, title, url string, ctx *os.File) *FLVWriter {
 	return ret
 }
 
-func (writer *FLVWriter) Write(p *av.Packet) error {
+func (writer *FLVWriter) Write(p *avv.Packet) error {
 	writer.RWBaser.SetPreTime()
 	h := writer.buf[:headerLen]
-	typeID := av.TAG_VIDEO
+	typeID := avv.TAG_VIDEO
 	if !p.IsVideo {
 		if p.IsMetadata {
 			var err error
-			typeID = av.TAG_SCRIPTDATAAMF0
+			typeID = avv.TAG_SCRIPTDATAAMF0
 			p.Data, err = amf.MetaDataReform(p.Data, amf.DEL)
 			if err != nil {
 				return err
 			}
 		} else {
-			typeID = av.TAG_AUDIO
+			typeID = avv.TAG_AUDIO
 		}
 	}
 	dataLen := len(p.Data)
@@ -135,7 +112,7 @@ func (writer *FLVWriter) Close(error) {
 	close(writer.closed)
 }
 
-func (writer *FLVWriter) Info() (ret av.Info) {
+func (writer *FLVWriter) Info() (ret avv.Info) {
 	ret.UID = writer.Uid
 	ret.URL = writer.url
 	ret.Key = writer.app + "/" + writer.title
@@ -144,7 +121,7 @@ func (writer *FLVWriter) Info() (ret av.Info) {
 
 type FlvDvr struct{}
 
-func (f *FlvDvr) GetWriter(info av.Info) av.WriteCloser {
+func (f *FlvDvr) GetWriter(info avv.Info) avv.WriteCloser {
 	paths := strings.SplitN(info.Key, "/", 2)
 	if len(paths) != 2 {
 		log.Warning("invalid info")

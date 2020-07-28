@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"github.com/imthaghost/gostream/av"
+	"github.com/imthaghost/gostream/avv"
 	"github.com/imthaghost/gostream/configure"
 )
 
@@ -21,16 +21,16 @@ func NewCache() *Cache {
 	}
 }
 
-func (cache *Cache) Write(p av.Packet) {
+func (cache *Cache) Write(p avv.Packet) {
 	if p.IsMetadata {
 		cache.metadata.Write(&p)
 		return
 	} else {
 		if !p.IsVideo {
-			ah, ok := p.Header.(av.AudioPacketHeader)
+			ah, ok := p.Header.(avv.AudioPacketHeader)
 			if ok {
-				if ah.SoundFormat() == av.SOUND_AAC &&
-					ah.AACPacketType() == av.AAC_SEQHDR {
+				if ah.SoundFormat() == avv.SOUND_AAC &&
+					ah.AACPacketType() == avv.AAC_SEQHDR {
 					cache.audioSeq.Write(&p)
 					return
 				} else {
@@ -39,7 +39,7 @@ func (cache *Cache) Write(p av.Packet) {
 			}
 
 		} else {
-			vh, ok := p.Header.(av.VideoPacketHeader)
+			vh, ok := p.Header.(avv.VideoPacketHeader)
 			if ok {
 				if vh.IsSeq() {
 					cache.videoSeq.Write(&p)
@@ -54,7 +54,7 @@ func (cache *Cache) Write(p av.Packet) {
 	cache.gop.Write(&p)
 }
 
-func (cache *Cache) Send(w av.WriteCloser) error {
+func (cache *Cache) Send(w avv.WriteCloser) error {
 	if err := cache.metadata.Send(w); err != nil {
 		return err
 	}

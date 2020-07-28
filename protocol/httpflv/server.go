@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/imthaghost/gostream/av"
-	"github.com/imthaghost/gostream/rtmp"
+	"github.com/imthaghost/gostream/protocol/rtmp"
 
 	log "github.com/sirupsen/logrus"
 )

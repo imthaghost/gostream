@@ -23,8 +23,10 @@ Simple and efficient live broadcast API. Currently supports commonly used transm
 - MP3
 
 #### Boot from Docker
-Run `docker run -p 1935:1935 -p 7001:7001 -p 7002:7002 -p 8090:8090 -d gwuhaolin/gostream` to start
-
+```bash
+# run
+docker run -p 1935:1935 -p 7001:7001 -p 7002:7002 -p 8090:8090 -d imthaghost/gostream
+``` 
 #### Compile from source
 1. Download the source code `git clone https://github.com/imthaghost/gostream.git`
 2. Go to the gostream directory and execute `go build` or `make build`

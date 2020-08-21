@@ -226,7 +226,7 @@ func (s *Server) handlePull(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	remoteurl := "rtmp://127.0.0.1" + s.rtmpAddr + "/" + app + "/" + name
+	remoteurl := "rtmp://0.0.0.0" + s.rtmpAddr + "/" + app + "/" + name
 	localurl := url
 
 	keyString := "pull:" + app + "/" + name

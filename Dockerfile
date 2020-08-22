@@ -18,4 +18,4 @@ EXPOSE ${RTMP_PORT}
 EXPOSE ${HTTP_FLV_PORT}
 EXPOSE ${HLS_PORT}
 EXPOSE ${HTTP_OPERATION_PORT}
-ENTRYPOINT ["./gostream"]
+ENTRYPOINT ["./gostream", "--level", "debug"]
